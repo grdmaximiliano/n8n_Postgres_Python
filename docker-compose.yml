@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   # The PostgreSQL Database Service
   postgres:
     image: postgres:14
-    container_name: n8n-postgres
+    # Removed fixed 'container_name' to allow for multiple deployments
     restart: unless-stopped
     environment:
       # These variables MUST be set in your Easypanel project's
@@ -27,17 +25,15 @@ services:
     # This tells docker-compose to build the image
     # from the Dockerfile in the current directory.
     build: .
-    container_name: n8n-app
+    # Removed fixed 'container_name' to allow for multiple deployments
     restart: unless-stopped
-    ports:
-      # Easypanel will manage the external port. 
-      # This exposes the internal port n8n runs on.
-      - "5678:5678"
+    # Removed fixed 'ports' mapping, Easypanel handles publishing the internal 5678 port
     environment:
       # Connection details for the Postgres database.
       # These MUST also be set in your Easypanel environment settings.
       - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=postgres # This is the service name from above
+      # Use the service name defined above, which Easypanel resolves automatically
+      - DB_POSTGRESDB_HOST=postgres 
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
       - DB_POSTGRESDB_USER=${POSTGRES_USER}
@@ -47,7 +43,7 @@ services:
       - EXECUTIONS_PROCESS=main
       
       # Recommended: Set your timezone
-      - GENERIC_TIMEZONE=Europe/Berlin # Change to your timezone
+      - GENERIC_TIMEZONE=Europe/Madrid # Change to your timezone
 
       # This ensures n8n waits for Postgres to be ready
     depends_on:
