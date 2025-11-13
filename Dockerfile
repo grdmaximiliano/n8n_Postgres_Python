@@ -6,14 +6,16 @@ FROM n8nio/n8n
 USER root
 
 # --- Add your Python libraries here ---
-# The base image already includes Python 3.
-# You can use pip to install any libraries you need for your scripts.
-# For example, to install 'pandas' and 'requests':
-#
-# RUN pip install pandas requests
-#
-# Add any other 'pip install' commands you need below.
+# 1. Update the package lists
+# 2. Install pip for Python 3
+# 3. Clean up the apt cache to keep the image smaller
+RUN apt-get update && \
+    apt-get install -y python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Now, use pip3 to install your Python libraries
 RUN pip3 install pandas
+# Add any other 'pip3 install' commands here
 
 
 # Switch back to the non-privileged 'node' user
