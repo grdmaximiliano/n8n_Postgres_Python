@@ -10,8 +10,10 @@ USER root
 RUN apk update && \
     apk add --no-cache python3 py3-pip build-base
 
-# 2. Use pip3 to install your Python libraries
-RUN pip3 install pandas
+# 2. Use pip3 to install your Python libraries.
+# We must use --break-system-packages to bypass PEP 668 protection in Alpine,
+# as we need to install the package system-wide for n8n to access it.
+RUN pip3 install pandas --break-system-packages
 # Add any other 'pip3 install' commands here
 
 # 3. Clean up: Remove build dependencies to reduce the final image size.
