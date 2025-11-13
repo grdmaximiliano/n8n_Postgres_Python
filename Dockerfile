@@ -13,7 +13,7 @@ USER root
 # RUN pip install pandas requests
 #
 # Add any other 'pip install' commands you need below.
-RUN pip install pandas
+RUN pip3 install pandas
 
 
 # Switch back to the non-privileged 'node' user
