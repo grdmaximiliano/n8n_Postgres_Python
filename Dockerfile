@@ -6,16 +6,16 @@ FROM n8nio/n8n
 USER root
 
 # --- Add your Python libraries here ---
-# The base image is Alpine, so we use 'apk' (not 'apt-get')
-# 1. Update the package lists
-# 2. Install pip for Python 3 using --no-cache to avoid a separate cache cleanup step
+# 1. Install Python 3, pip, and build-base (required for packages like pandas/numpy to compile C extensions)
 RUN apk update && \
-    apk add --no-cache python3-pip
+    apk add --no-cache python3 py3-pip build-base
 
-# Now, use pip3 to install your Python libraries
+# 2. Use pip3 to install your Python libraries
 RUN pip3 install pandas
 # Add any other 'pip3 install' commands here
 
+# 3. Clean up: Remove build dependencies to reduce the final image size.
+RUN apk del build-base
 
 # Switch back to the non-privileged 'node' user
 # for security before starting the application.
