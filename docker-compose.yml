@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # The PostgreSQL Database Service
+  postgres:
+    image: postgres:14
+    container_name: n8n-postgres
+    restart: unless-stopped
+    environment:
+      # These variables MUST be set in your Easypanel project's
+      # environment settings for this service.
+      # Do not hardcode them here.
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      # This creates a persistent volume for your database data
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # The n8n Application Service
+  n8n:
+    # This tells docker-compose to build the image
+    # from the Dockerfile in the current directory.
+    build: .
+    container_name: n8n-app
+    restart: unless-stopped
+    ports:
+      # Easypanel will manage the external port. 
+      # This exposes the internal port n8n runs on.
+      - "5678:5678"
+    environment:
+      # Connection details for the Postgres database.
+      # These MUST also be set in your Easypanel environment settings.
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres # This is the service name from above
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      
+      # This is the key setting to enable local Python script execution
+      - EXECUTIONS_PROCESS=main
+      
+      # Recommended: Set your timezone
+      - GENERIC_TIMEZONE=Europe/Berlin # Change to your timezone
+
+      # This ensures n8n waits for Postgres to be ready
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # This creates a persistent volume for your n8n workflows and data
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  # Define the persistent volumes
+  n8n_data:
+  postgres_data:
