@@ -41,6 +41,7 @@ services:
       
       # This is the key setting to enable local Python script execution
       - EXECUTIONS_PROCESS=main
+      - N8N_HOST=${N8N_HOST}
       
       # Recommended: Set your timezone
       - GENERIC_TIMEZONE=Europe/Madrid # Change to your timezone
@@ -52,6 +53,10 @@ services:
     volumes:
       # This creates a persistent volume for your n8n workflows and data
       - n8n_data:/home/node/.n8n
+
+    # IMPORTANT FIX: Use a custom command to ensure n8n waits for Postgres
+    # to be fully ready and accepting connections before starting the app.
+    command: /bin/sh -c "wait-for-it postgres:5432 -t 10 -- n8n start"
 
 volumes:
   # Define the persistent volumes
