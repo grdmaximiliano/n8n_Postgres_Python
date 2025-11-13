@@ -41,7 +41,7 @@ services:
       
       # This is the key setting to enable local Python script execution
       - EXECUTIONS_PROCESS=main
-      - N8N_HOST=${N8N_HOST}
+      - WEBHOOK_URL=${WEBHOOK_URL}
       
       # Recommended: Set your timezone
       - GENERIC_TIMEZONE=Europe/Madrid # Change to your timezone
